@@ -1,0 +1,174 @@
+<?php
+/*
+  Plugin Name: price_form2
+  Plugin URI: https://example.code
+  Description: buy buttons
+  Version: 1.0
+  Author: VVN
+  Author URI: https://vvn
+ */
+
+?>
+<!--Стили и скрипты включены в данный файл для примера -->
+<script type='text/javascript' src='https://code.jquery.com/jquery.js?ver=1.12.4'></script>
+<script type='text/javascript' src='https://code.jquery.com/jquery-migrate.min.js?ver=1.4.1'></script>
+<style>
+
+	.checkbox {
+		position: absolute;
+		z-index: 100000;
+		opacity: 0;
+		margin: 20px 0 0 20px;
+	}
+	.checkbox + label {
+		display: inline-block;
+		position: relative;
+		padding: 0 0 5px 60px;
+		cursor: pointer;
+		z-index: 100000;
+	}
+	label {
+		margin-bottom: 10px;
+	}
+	.checkbox + label:before {
+		content: "";
+		position: absolute;
+		top: -4px;
+		left: 0;
+		width: 50px;
+		height: 26px;
+		border-radius: 13px;
+		background: #CDD1DA;
+		box-shadow: inset 0 2px 3px rgba(0,0,0,.2);
+		transition: .2s;
+	}
+	.checkbox + label:after {
+		content: "";
+		position: absolute;
+		top: -2px;
+		left: 2px;
+		width: 22px;
+		height: 22px;
+		border-radius: 10px;
+		background: #FFF;
+		box-shadow: 0 2px 5px rgba(0,0,0,.3);
+		transition: .2s;
+	}
+	.checkbox:checked + label:before {
+		background: #e3000f;
+	}
+	.checkbox:checked + label:after {
+		left: 26px;
+	}
+	.checkbox:focus + label:before {
+		box-shadow: inset 0 2px 3px rgba(0,0,0,.2), 0 0 0 3px rgba(255,128,0,.7);
+	}
+	.btn_buy {
+		border: 0px;
+		height: 20px;		
+		width: 170px;	
+		background: #ddd;
+		cursor: pointer;
+		position: relative;
+	}
+	.btn_buy:hover{
+		background: #aaa;
+		cursor: hand;
+	}	
+</style>
+
+<div>
+	<input type="checkbox" class="checkbox" name="item-2" id="item-2" value="100"> 
+    <label for="item-2">10 запросов - 100 рублей</label>
+    
+  </div>
+  <br>
+  <div>
+    <input type="checkbox" class="checkbox" name="item-3" id="item-3" value="200"> 
+	<label for="item-3">30 запросов - 200 рублей</label>
+    
+  </div>
+  <br>
+  <div>
+    <input type="checkbox" class="checkbox" name="item-4" id="item-4" value="400">
+	<label for="item-4">90 запросов - 400 рублей</label>
+    
+  </div>
+  <br>
+  <div>
+    <input type="checkbox" class="checkbox" name="item-5" id="item-5" value="800">
+	<label for="item-5">270 запросов - 800 рублей</label>
+     
+  </div>
+</form>
+<br>
+
+<div>
+  Стоимость: <strong><span id="price">0</span> рублей </strong>
+</div>
+
+<br>
+<form id="form_bill" method="post" action="/payment-page/">
+<input id="calc1" name="calc1" type="hidden">
+<button type="submit" class="btn_buy">Сформировать счет</button>
+</form>
+<br>
+<form id="form_card" method="post" action="/payment-page/">
+<input id="calc2" name="calc2" type="hidden">
+<button type="submit" class="btn_buy">Оплатить по карте</button>
+</form>
+<script type="text/javascript">
+
+var total = 0;
+
+
+(function($) {
+   
+
+
+function CalculateTotal() {
+  $("input:checkbox").each(function() {
+    if ($(this).is(":checked")) {
+      total += parseFloat($(this).val());
+    }
+  });
+  $("#price").html(total);
+}
+
+$("input:checkbox").change(function() {
+  total = 0;
+  CalculateTotal();
+   if(total > 0) 	{
+	$("#calc1_button").removeAttr("disabled");   
+	$("#calc2_button").removeAttr("disabled");
+ } else{
+	$("#calc1_button").prop("disabled", true);
+	$("#calc2_button").prop("disabled", true);
+ }
+}).trigger("change");
+
+
+
+document.getElementById("form_bill").onsubmit = function () {
+document.getElementById("calc1").value = total;
+};
+document.getElementById("form_card").onsubmit = function () {
+	
+document.getElementById("calc2").value = total;
+
+}; 
+ })(jQuery);
+ 
+
+</script>
+<?php
+// Register a new shortcode: [cr_price]
+add_shortcode('cr_price', 'price_shortcode');
+
+// The callback function that will replace [hook]
+function price_shortcode() {
+    ob_start();
+	price_echo();
+    return ob_get_clean();
+}	
+?>
